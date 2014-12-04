@@ -9,6 +9,8 @@ var debug = require('debug');
 var bootstrapDebug = debug('Example');
 var app = require('./app');
 var dehydratedState = window.App; // Sent from the server
+var Router = require('react-router');
+var HistoryLocation = Router.HistoryLocation;
 
 window.React = React; // For chrome dev tool support
 debug.enable('*');
@@ -22,9 +24,12 @@ app.rehydrate(dehydratedState, function (err, context) {
     var mountNode = document.getElementById('app');
 
     bootstrapDebug('React Rendering');
-    React.render(app.getAppComponent()({
-        context: context.getComponentContext()
-    }), mountNode, function () {
-        bootstrapDebug('React Rendered');
+
+    Router.run(app.getAppComponent(), HistoryLocation, function (Handler, state) {
+        React.render(Handler({
+            context: context.getComponentContext()
+        }), mountNode, function () {
+            bootstrapDebug('React Rendered');
+        });
     });
 });
